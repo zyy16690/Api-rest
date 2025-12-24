@@ -41,7 +41,7 @@ app.get('/', (req, res) => {
     res.render('documentation', {
         title: 'API Documentation',
         routes: apiRoutes,
-        hostUrl: `http://localhost:${PORT}`
+        hostUrl: `http://213.163.192.116:${PORT}`
     });
 });
 
@@ -51,7 +51,7 @@ app.get('/documentation', (req, res) => {
     res.render('documentation', {
         title: 'API Documentation',
         routes: apiRoutes,
-        hostUrl: `http://localhost:${PORT}`
+        hostUrl: `http://213.163.192.116:${PORT}`
     });
 });
 
@@ -83,5 +83,5 @@ orderKuotaRoutes.forEach(route => {
 // --- Server Listener ---
 
 app.listen(PORT, () => {
-    console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
+    console.log(`🚀 Server berjalan di http://213.163.192.116:${PORT}`);
 });
