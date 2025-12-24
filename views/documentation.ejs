@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>OrderKuota API Gateway</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Variabel Warna dan Tema */
+        :root {
+            --primary-dark: #0a0f1c;
+            --secondary-dark: #131a2d;
+            --card-dark: #1a2238;
+            --accent-blue: #3a86ff;
+            --accent-purple: #8338ec;
+            --accent-gradient: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            --text-primary: #ffffff;
+            --text-secondary: #b0b7c3;
+            --text-muted: #6c757d;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.3);
+            --code-bg: #0d1117;
+        }
+
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--primary-dark);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Navbar */
+        .navbar-custom {
+            background: rgba(10, 15, 28, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-link {
+            color: var(--text-secondary) !important;
+            font-weight: 500;
+            padding: 8px 16px !important;
+            border-radius: 8px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-blue) !important;
+            background-color: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            color: var(--accent-blue) !important;
+            background-color: rgba(58, 134, 255, 0.1);
+        }
+
+        /* Container */
+        .container-custom {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 70px 0 50px;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--accent-gradient);
+            opacity: 0.3;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 10px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .base-url {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--card-dark);
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 10px;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 40px 0 60px;
+        }
+
+        .stat-card {
+            background: var(--card-dark);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(58, 134, 255, 0.3);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Section Styling */
+        .section {
+            margin-bottom: 60px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0;
+        }
+
+        .section-count {
+            background: var(--accent-gradient);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* API Items */
+        .api-item {
+            display: flex;
+            align-items: center;
+            background-color: var(--card-dark);
+            padding: 20px 25px;
+            border-radius: var(--border-radius);
+            margin: 15px 0;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: var(--shadow);
+        }
+
+        .api-item:hover {
+            transform: translateY(-5px);
+            border-color: rgba(58, 134, 255, 0.3);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .api-item .method {
+            color: var(--success);
+            font-weight: 700;
+            font-size: 14px;
+            width: 80px;
+            padding: 8px 12px;
+            background-color: rgba(40, 167, 69, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .api-item .endpoint-info {
+            flex-grow: 1;
+            margin: 0 0px;
+        }
+
+        .endpoint-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .endpoint-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .try-btn {
+            background: var(--accent-gradient);
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .try-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(58, 134, 255, 0.4);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 0;
+            margin-top: 80px;
+            color: var(--text-muted);
+            font-size: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Modal Custom Styling */
+        .modal-content {
+            background-color: var(--card-dark);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px 30px;
+        }
+
+        .modal-title {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 30px;
+        }
+
+        .btn-close {
+            filter: invert(1);
+            opacity: 0.7;
+        }
+
+        .btn-close:hover {
+            opacity: 1;
+        }
+
+        .form-control {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 14px 16px;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+        
+        .form-control::placeholder {
+  color: #999;               /* warna default placeholder */
+  opacity: 1;                /* penting untuk bootstrap */
+}
+
+        .form-control:focus {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 0.25rem rgba(58, 134, 255, 0.25);
+            color: var(--text-primary);
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .modal-code-block {
+            background-color: var(--code-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        pre {
+            color: #9cdcfe;
+            font-size: 0.9rem;
+            margin: 0;
+            padding: 25px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .code-block-header {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 14px 25px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .path-code-display {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--accent-blue);
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            word-break: break-all;
+            
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            line-height: 1.5;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-waiting {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: var(--warning);
+        }
+
+        .status-loading {
+            background-color: rgba(13, 110, 253, 0.2);
+            color: var(--accent-blue);
+        }
+
+        .status-success {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: var(--success);
+        }
+
+        .status-error {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: var(--danger);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            .header h1 {
+                font-size: 2.3rem;
+            }
+            
+            .api-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .api-item .method {
+                width: auto;
+            }
+            
+            .try-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .stats-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .nav-link {
+                padding: 6px 12px !important;
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--secondary-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-blue);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-purple);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-custom">
+        <!-- Header Section -->
+        <div class="header fade-in">
+            <h1>OrderKuota API Gateway</h1>
+            <p>Payment Gateway yang powerful dan mudah diintegrasikan, didukung oleh Express.js</p>
+        </div>
+
+        <!-- Stats Section -->
+
+
+        <!-- API Sections -->
+        <% 
+            const categories = routes.reduce((acc, route) => {
+                acc[route.category] = acc[route.category] || [];
+                acc[route.category].push(route);
+                return acc;
+            }, {});
+        %>
+
+        <% for (const category in categories) { %>
+            <div class="section fade-in">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-folder-open"></i> 
+                        <%= category %>
+                    </h2>
+                    <span class="section-count"><%= categories[category].length %> endpoints</span>
+                </div>
+                <% categories[category].forEach((route, index) => { 
+                    const rawParams = route.path.split('?')[1].split('&').filter(p => p.includes('='));
+                    const params = rawParams.map(p => p.split('=')[0]);
+                %>
+                <div class="api-item fade-in" style="animation-delay: <%= index * 0.05 %>s">
+                    <span class="method">GET</span>
+                    <div class="endpoint-info">
+                        <div class="endpoint-name"><%= route.name %></div>
+                        <div class="endpoint-desc"><%= route.desc %></div>
+                    </div>
+                    <button 
+                        class="try-btn"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#apiTestModal"
+                        data-endpoint-name="<%= route.name %>"
+                        data-full-path = "<%= route.path %>"
+                        data-endpoint-path="<%= route.path.split('?')[0] %>"
+                        data-params="<%= params.join(',') %>"
+                        data-desc="<%= route.desc %>"
+                    >
+                        <i class="fas fa-play-circle"></i> Test API
+                    </button>
+                </div>
+                <% }); %>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer fade-in">
+        <div class="container-custom">
+            <p>&copy; <%= new Date().getFullYear() %> OrderKuota API Gateway. All rights reserved.</p>
+            <p class="mt-2">Built with <i class="fas fa-heart text-danger"></i> using Express.js</p>
+        </div>
+    </div>
+
+    <!-- API Test Modal -->
+    <div class="modal fade" id="apiTestModal" tabindex="-1" aria-labelledby="apiTestModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEndpointName">
+                        <i class="fas fa-code me-2"></i> <span id="modalTitleText">API Endpoint</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    
+                    <div class="mb-4">
+                        <p class="mb-2 fw-semibold text-light"><i class="fas fa-link me-2"></i> Endpoint Path:</p>
+                        <p id="modalEndpointPath" class="path-code-display"></p>
+                    </div>
+                    
+                    <h6 class="text-light fw-bold mt-4 mb-3">
+                        <i class="fas fa-cogs me-2"></i> Parameter Input
+                    </h6>
+                    <form id="apiTestForm" class="p-4 mb-4 rounded" style="background-color: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05);">
+                        <div id="paramInputs"></div>
+                        <button type="submit" class="btn btn-success mt-3 w-100 fw-bold py-3">
+                            <i class="fas fa-paper-plane me-2"></i> Execute Request
+                        </button>
+                    </form>
+
+                    <h6 class="text-light fw-bold mt-4 mb-3">
+                        <i class="fas fa-reply me-2"></i> API Response
+                    </h6>
+                    <div class="modal-code-block mt-2">
+                        <div class="code-block-header">
+                            <span>Response Output</span>
+                            <span id="responseStatus" class="status-badge status-waiting">Waiting...</span>
+                        </div>
+                        <pre id="apiResponseContent">Enter parameters and click 'Execute Request' to see the results.</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const hostUrl = '<%= hostUrl %>';
+        const modal = document.getElementById('apiTestModal');
+        const defaultApiKey = false
+
+        function getParamDescription(name) {
+            const descriptions = {
+                'apikey': { desc: 'Kunci API yang terdaftar.', example: 'apikey77' },
+                'username': { desc: 'Username akun OrderKuota.', example: 'userku' },
+                'password': { desc: 'Password akun OrderKuota (Hanya untuk /getotp).', example: 'password123' },
+                'otp': { desc: 'Kode OTP yang diterima dari email/SMS (Hanya untuk /gettoken).', example: '123456' },
+                'token': { desc: 'Auth Token hasil dari /gettoken.', example: '123456:abcdef...' },
+                'amount': { desc: 'Jumlah nominal (dalam IDR).', example: '10000' }, 
+                'provider': { desc: 'Jumlah nominal (dalam IDR).', example: 'dana/ovo/gopay' }, 
+                'nomor': { desc: 'Jumlah nominal (dalam IDR).', example: '083164476501' }
+            };
+            return descriptions[name] || { desc: 'Parameter yang diperlukan.', example: '...' };
+        }
+
+        modal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const endpointName = button.getAttribute('data-endpoint-name');
+            const endpointPath = button.getAttribute('data-endpoint-path');
+            const fullPath = button.getAttribute('data-full-path');
+            const rawParams = button.getAttribute('data-params');
+            
+            const params = rawParams ? rawParams.split(',') : [];
+
+            document.getElementById('modalTitleText').textContent = endpointName;
+            
+            document.getElementById('modalEndpointPath').textContent = hostUrl + fullPath;
+            document.getElementById('apiResponseContent').textContent = 'Enter parameters and click \'Execute Request\' to see the results.';
+            
+            const statusElement = document.getElementById('responseStatus');
+            statusElement.textContent = 'Waiting...';
+            statusElement.className = 'status-badge status-waiting';
+
+            const paramInputs = document.getElementById('paramInputs');
+            paramInputs.innerHTML = '';
+
+            // Generate Input Form
+            params.forEach(paramName => {
+                const paramDetails = getParamDescription(paramName);
+                
+                const inputGroup = document.createElement('div');
+                inputGroup.className = 'mb-3';
+                inputGroup.innerHTML = `
+                    <label for="${paramName}" class="form-label fw-semibold">${paramName} <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="${paramName}" name="${paramName}" required placeholder="Example: ${paramDetails.example}">
+                `;
+                paramInputs.appendChild(inputGroup);
+            });
+            
+            // Jika tidak ada parameter (hanya apikey)
+            if (params.length === 1 && params[0] === 'apikey') {
+                 paramInputs.innerHTML = '<div class="alert alert-info">This endpoint only requires an API Key.</div>';
+            }
+
+            // Event Listener Form Submission
+            const apiTestForm = document.getElementById('apiTestForm');
+            apiTestForm.onsubmit = null;
+            apiTestForm.onsubmit = async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(apiTestForm);
+                const query = new URLSearchParams();
+                let fullUrl = hostUrl + endpointPath + '?';
+                
+                formData.forEach((value, key) => {
+                    query.append(key, value);
+                });
+
+                fullUrl += query.toString();
+                
+                const statusElement = document.getElementById('responseStatus');
+                statusElement.textContent = 'Loading...';
+                statusElement.className = 'status-badge status-loading';
+                document.getElementById('apiResponseContent').textContent = 'Sending request...';
+
+                try {
+                    const response = await fetch(fullUrl);
+                    let data;
+                    try {
+                        data = await response.json();
+                    } catch (e) {
+                        data = { error: "Response is not JSON", raw: await response.text() };
+                    }
+                    
+                    statusElement.textContent = `${response.status} ${response.statusText}`;
+                    document.getElementById('apiResponseContent').textContent = JSON.stringify(data, null, 2);
+
+                    if (!response.ok || data.status === false) {
+                        statusElement.className = 'status-badge status-error';
+                    } else {
+                        statusElement.className = 'status-badge status-success';
+                    }
+
+                } catch (error) {
+                    statusElement.textContent = 'ERROR (Network)';
+                    statusElement.className = 'status-badge status-error';
+                    document.getElementById('apiResponseContent').textContent = `Network error: ${error.message}. Please ensure your Express.js server is running.`;
+                }
+            };
+        });
+
+        // Add active class to current nav item
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
